@@ -1,0 +1,67 @@
+name: Daily SEO Agent
+
+on:
+  schedule:
+    - cron: '30 2 * * *' # 8:00 AM IST (2:30 AM UTC)
+  workflow_dispatch:
+
+jobs:
+  run-seo-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          cd workbench/nextjs-turbopack
+          pnpm install --frozen-lockfile
+
+      - name: Setup GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: Run SEO Agent Workflow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+        run: |
+          cd workbench/nextjs-turbopack
+          # Trigger workflow via API endpoint
+          DEPLOYMENT_URL="${{ secrets.DEPLOYMENT_URL || 'https://www.drsayuj.info' }}"
+          curl -X POST "${DEPLOYMENT_URL}/api/trigger?workflowFile=workflows/seo-agent.ts&workflowFn=seoAgentWorkflow" \
+            -H "Content-Type: application/json" \
+            -w "\nHTTP_STATUS:%{http_code}" || echo "HTTP_STATUS:000"
+
+      - name: Commit results (if workflow ran locally)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.email "bot@drsayuj.info"
+          git config user.name "SEO Agent"
+          git add seo/reports || true
+          git diff --staged --quiet || git commit -m "chore(seo): automated audit report" || true
+          git push origin main || true
+
+      - name: Trigger Vercel Deploy
+        if: success()
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          cd workbench/nextjs-turbopack
+          npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes || echo "Deployment skipped"

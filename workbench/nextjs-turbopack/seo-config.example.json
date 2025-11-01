@@ -1,0 +1,38 @@
+{
+  "targetSite": "https://www.drsayuj.info",
+  "competitors": [
+    "https://yashodahospitals.com",
+    "https://apolloshospitals.com",
+    "https://drraveesh.com",
+    "https://ravisumanneuro.com",
+    "https://practo.com"
+  ],
+  "targetKeywords": [
+    "Best Neurosurgeon in Hyderabad",
+    "Endoscopic Spine Surgery Hyderabad",
+    "Spine Surgeon Hyderabad"
+  ],
+  "apiKeys": {
+    "openai": "YOUR_OPENAI_API_KEY",
+    "dataforseo": "YOUR_DATAFORSEO_API_KEY",
+    "semrush": "YOUR_SEMRUSH_API_KEY",
+    "lighthouse": "YOUR_LIGHTHOUSE_API_KEY"
+  },
+  "github": {
+    "repository": "owner/repo",
+    "token": "YOUR_GITHUB_TOKEN"
+  },
+  "vercel": {
+    "projectId": "YOUR_VERCEL_PROJECT_ID",
+    "teamId": "YOUR_VERCEL_TEAM_ID",
+    "token": "YOUR_VERCEL_TOKEN"
+  },
+  "reporting": {
+    "outputDir": "seo/reports",
+    "logFile": "logs/seo-agent.log"
+  }
+}
+
+
+
+

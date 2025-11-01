@@ -3,6 +3,7 @@ import { hydrateWorkflowArguments } from 'workflow/internal/serialization';
 import * as batchingWorkflow from '@/workflows/6_batching';
 import * as duplicateE2e from '@/workflows/98_duplicate_case';
 import * as e2eWorkflows from '@/workflows/99_e2e';
+import * as seoAgent from '@/workflows/seo-agent';
 
 export async function POST(req: Request) {
   const url = new URL(req.url);
@@ -40,6 +41,8 @@ export async function POST(req: Request) {
       workflows = e2eWorkflows;
     } else if (workflowFile === 'workflows/6_batching.ts') {
       workflows = batchingWorkflow;
+    } else if (workflowFile === 'workflows/seo-agent.ts') {
+      workflows = seoAgent;
     } else {
       workflows = duplicateE2e;
     }
